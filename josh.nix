@@ -12,9 +12,10 @@
 , npmHooks
 , fetchNpmDeps
 , python3
+, curl
+, gitMinimal
 }:
-
-rustPlatform.buildRustPackage (rec {
+let package = rustPlatform.buildRustPackage (rec {
   pname = "josh";
   version = "23.02.14";
 
@@ -62,6 +63,12 @@ rustPlatform.buildRustPackage (rec {
     mv scripts/git-sync $out/bin
     mv static/* $web
     '';
+  checkFetures = [ "test-server" ];
+  nativeCheckInputs = [ python3.pkgs.cram curl gitMinimal ];
+  postCheck = ''
+    ls -lahR
+    '';
+
   passthru = {
     shellPath = "/bin/josh-ssh-shell";
   };
@@ -73,4 +80,5 @@ rustPlatform.buildRustPackage (rec {
     license = licenses.mit;
     maintainers = with maintainers; [ ];
   };
-})
+});
+in package
